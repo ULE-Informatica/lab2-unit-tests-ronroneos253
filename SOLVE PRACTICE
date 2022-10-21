@@ -1,0 +1,81 @@
+//Example funciton STD-INT-30C
+
+#include <math.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdint.h> 
+
+unsigned int wrapFunctionAdd(unsigned int ui_a, unsigned int ui_b) {
+    unsigned int usum;
+  if (UINT_MAX - ui_a < ui_b) {
+    /* Handle error */
+    printf("Error: wrapFunctionAdd Overflow!");
+    return -1;
+  } else {
+    usum = ui_a + ui_b;
+  }
+  return usum;
+}
+
+unsigned int wrapFunctionMul(unsigned int ui_a, unsigned int ui_b) {
+  unsigned umul = ui_a;
+  if (ui_b > UINT_MAX / ui_a) {
+  /* Handle error */
+  printf("Error: wrapFunctionMul Overflow!");
+  return -1;
+}
+else{
+umul =ui_b * ui_a;
+}
+  return umul;
+}
+
+uint32_t wrapFunctionShift(uint32_t ui_a, unsigned int ui_b) {
+uint32_t uShift;
+if(ui_b >= __builtin_popcount(UINT_MAX)){
+/*Handle error*/
+printf("Error: wrapFunctionShift Overflow!");
+return -1;
+} else{
+  uShift = ui_a << ui_b | ui_a >> (32 - ui_b); 
+  }
+  return uShift;
+}
+
+//TEST STD INT-30C
+
+// tests.cpp
+#include "exampleFunction.cpp"
+#include <limits.h>
+#include <gtest/gtest.h>
+ 
+
+TEST(wrapAddFunctionTest, NonWrappingNums) { 
+    ASSERT_EQ(9, wrapFunctionAdd(3,6));
+}
+ 
+TEST(wrapAddFunctionTest, WrappingNums) {
+    ASSERT_EQ(-1, wrapFunctionAdd(UINT_MAX,1));
+}
+
+TEST(wrapMulFunctionTest, NonWrappingMulNums) { 
+    ASSERT_EQ(18, wrapFunctionMul(3,6));
+}
+ 
+TEST(wrapMulFunctionTest, WrappingMulNums) {
+    ASSERT_EQ(-1, wrapFunctionMul(UINT_MAX, UINT_MAX));
+}
+
+TEST(wrapShiftFunctionTest, NonWrappingMulBNums) { 
+    ASSERT_EQ(4, wrapFunctionShift(2,1));
+}
+ 
+TEST(wrapShiftFunctionTest, WrappingMulBNums) {
+    ASSERT_EQ(4294967295, wrapFunctionShift(UINT_MAX, 12));
+}
+
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
